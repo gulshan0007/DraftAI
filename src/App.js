@@ -11,11 +11,23 @@ function App() {
   const modalEditorRef = useRef(null);
   const fileInputRef = useRef(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [extractModalOpen, setExtractModalOpen] = useState(false);
+  const [insertModalOpen, setInsertModalOpen] = useState(false);
   const [modalWidth, setModalWidth] = useState(600); // Initial width
   const [modalHeight, setModalHeight] = useState(400); // Initial height
   const [modalText, setModalText] = useState('');
-  
-  
+  const [extractedContent, setExtractedContent] = useState(''); // State for extracted content
+  const [insertPosition, setInsertPosition] = useState(null);
+  const [placeholders, setPlaceholders] = useState({
+    '[EMPLOYEE NAME]': '',
+    '[EMPLOYEE ADDRESS]': '',
+    '[STATE OR COUNTRY]': '',
+    '[COMPANY NAME]': '',
+    '[COMPANY ADDRESS]': '',
+    '[EFFECTIVE DATE] ': '',
+
+  });
+
   useEffect(() => {
     // When modalText changes, update the main editor
     if (modalText && editorRef.current) {
@@ -41,6 +53,7 @@ function App() {
       }, 100);
     }
   };
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -49,8 +62,29 @@ function App() {
         const fileContent = event.target.result;
         editorRef.current.documentEditor.open(fileContent); // Open file in main editor
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(file); // Read as array buffer for better compatibility with the DocumentEditor
     }
+  };
+
+  const handleExtract = () => {
+    if (editorRef.current) {
+      const extractedSfdt = editorRef.current.documentEditor.serialize();
+      const extractedJson = JSON.stringify(JSON.parse(extractedSfdt), null, 2); // Format JSON with indentation
+      setExtractedContent(extractedJson); // Set extracted content
+      setExtractModalOpen(true); // Open extract modal
+    }
+  };
+
+  const handleDownload = () => {
+    const blob = new Blob([extractedContent], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'extracted_content.json';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const onModalClose = () => {
@@ -68,13 +102,43 @@ function App() {
     setModalHeight(size.height);
   };
 
+  const handleBackdropClick = (e) => {
+    if (e.target.className === 'modal-backdrop') {
+      setExtractModalOpen(false);
+      setInsertModalOpen(false);
+    }
+  };
+
+  const handleInsertClick = () => {
+    setInsertModalOpen(true);
+  };
+
+  const handleInsertText = () => {
+    const editor = editorRef.current.documentEditor.editor;
+    Object.keys(placeholders).forEach((key) => {
+      editorRef.current.documentEditor.searchModule.findAll(key);
+      editorRef.current.documentEditor.searchModule.searchResults.replaceAll(placeholders[key]);
+    });
+    setInsertModalOpen(false); // Close the modal after inserting text
+  };
+
+  const handlePlaceholderChange = (key, value) => {
+    setPlaceholders((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
   return (
     <div>
       <button onClick={onSave} style={{ marginBottom: 10, marginRight: 10 }}>Save</button>
       <button onClick={onEdit} style={{ marginBottom: 10, marginRight: 10, borderRadius: '50%' }}>Edit</button>
+      
       <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileChange} accept=".docx" />
       <button onClick={() => fileInputRef.current.click()} style={{ marginBottom: 10, marginRight: 10 }}>Open</button>
-      
+      <button onClick={handleExtract} style={{ marginBottom: 10, marginRight: 10 }}>Extract</button>
+      <button onClick={handleInsertClick} style={{ marginBottom: 10, marginRight: 10 }}>Insert</button>
+
       <DocumentEditorContainerComponent 
         id="container" 
         height='590' 
@@ -84,6 +148,7 @@ function App() {
         showStatusBar={true}
         ref={editorRef} 
       />
+
       {modalOpen && (
         <Draggable handle=".modal-drag-handle">
           <Resizable
@@ -120,8 +185,50 @@ function App() {
           </Resizable>
         </Draggable>
       )}
-      {modalOpen && (
-        <div className="modal-backdrop" onClick={onModalClose}></div>
+
+      {extractModalOpen && (
+        <div className="modal-backdrop" onClick={handleBackdropClick}>
+          <div className="extract-modal-wrapper">
+            <div className="extract-modal-content" style={{ width: modalWidth, height: modalHeight, backgroundColor: 'white' }}>
+              <div className="extract-modal-header">
+                <span>Extracted Content</span>
+                <button onClick={() => setExtractModalOpen(false)} className="modal-close-button">Close</button>
+                <button onClick={handleDownload} className="modal-download-button">Download JSON</button>
+              </div>
+              <div className="extract-modal-body" style={{ overflow: 'auto', height: modalHeight - 60 }}>
+                <pre>{extractedContent}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {insertModalOpen && (
+        <div className="modal-backdrop" onClick={handleBackdropClick}>
+          <div className="insert-modal-wrapper">
+            <div className="insert-modal-content" style={{ width: modalWidth, height: modalHeight, backgroundColor: 'white' }}>
+              <div className="insert-modal-header">
+                <span>Insert Text</span>
+                <button onClick={() => setInsertModalOpen(false)} className="modal-close-button">Close</button>
+              </div>
+              <div className="insert-modal-body" style={{ overflow: 'auto', height: modalHeight - 60 }}>
+                {Object.keys(placeholders).map((key, index) => (
+                  <div key={index} style={{ marginBottom: 10 }}>
+                    <label>{key}</label>
+                    <input
+                      id={`insert-text-${index}`}
+                      type="text"
+                      value={placeholders[key]}
+                      onChange={(e) => handlePlaceholderChange(key, e.target.value)}
+                      style={{ width: '100%' }}
+                    />
+                  </div>
+                ))}
+                <button onClick={handleInsertText} className="insert-button">Insert Text</button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
