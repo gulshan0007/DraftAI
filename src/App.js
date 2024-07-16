@@ -25,8 +25,11 @@ function App() {
     '[COMPANY NAME]': '',
     '[COMPANY ADDRESS]': '',
     '[EFFECTIVE DATE] ': '',
+    
 
   });
+   const [showToolbar, setShowToolbar] = useState(true);
+   const [showPropertiesPane, setShowPropertiesPane] = useState(true);
 
   useEffect(() => {
     // When modalText changes, update the main editor
@@ -111,6 +114,7 @@ function App() {
 
   const handleInsertClick = () => {
     setInsertModalOpen(true);
+    setShowPropertiesPane(false);
   };
 
   const handleInsertText = () => {
@@ -119,7 +123,8 @@ function App() {
       editorRef.current.documentEditor.searchModule.findAll(key);
       editorRef.current.documentEditor.searchModule.searchResults.replaceAll(placeholders[key]);
     });
-    setInsertModalOpen(false); // Close the modal after inserting text
+    setInsertModalOpen(false);
+    setShowPropertiesPane(true); // Close the modal after inserting text
   };
 
   const handlePlaceholderChange = (key, value) => {
@@ -169,7 +174,7 @@ function App() {
                   height={modalHeight - 60} // Adjust height for header
                   serviceUrl='http://localhost:6002/api/documenteditor/' 
                   enableToolbar={false}
-                  showPropertiesPane={false}
+                  showPropertiesPane={showPropertiesPane}
                   showStatusBar={false}
                   ref={modalEditorRef} 
                   textChange={(args) => {
@@ -203,33 +208,42 @@ function App() {
         </div>
       )}
 
-      {insertModalOpen && (
-        <div className="modal-backdrop" onClick={handleBackdropClick}>
-          <div className="insert-modal-wrapper">
-            <div className="insert-modal-content" style={{ width: modalWidth, height: modalHeight, backgroundColor: 'white' }}>
-              <div className="insert-modal-header">
-                <span>Insert Text</span>
-                <button onClick={() => setInsertModalOpen(false)} className="modal-close-button">Close</button>
+{insertModalOpen && (
+  <Draggable handle=".insert-modal-header">
+    <div className="modal-backdrop" onClick={handleBackdropClick}>
+      <div className="insert-modal-wrapper" style={{ position: 'fixed', right: 20, top: 50 }}>
+        <div className="insert-modal-content" style={{ width: 300, backgroundColor: 'white', padding: 20, borderRadius: 10, boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
+          <div className="insert-modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+            <span style={{ fontWeight: 'bold', fontSize: 18 }}>Configure Contract</span>
+            <button onClick={() => { setInsertModalOpen(false); }} className="modal-close-button" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <path fill="#000000" d="M19.707 4.293c-0.391-0.391-1.023-0.391-1.414 0l-4.293 4.293-4.293-4.293c-0.391-0.391-1.023-0.391-1.414 0s-0.391 1.023 0 1.414l4.293 4.293-4.293 4.293c-0.391 0.391-0.391 1.023 0 1.414 0.391 0.391 1.023 0.391 1.414 0l4.293-4.293 4.293 4.293c0.391 0.391 1.023 0.391 1.414 0s0.391-1.023 0-1.414l-4.293-4.293 4.293-4.293c0.391-0.391 0.391-1.023 0-1.414z"/>
+              </svg>
+            </button>
+          </div>
+          <div className="insert-modal-body" style={{ height: '400px', overflowY: 'auto', marginTop: 10, marginBottom: 10 }}>
+            {Object.keys(placeholders).map((key, index) => (
+              <div key={index} style={{ marginBottom: 15 }}>
+                <label>{key.replace('[', '').replace(']', '')}*</label>
+                <input
+                  id={`insert-text-${index}`}
+                  type="text"
+                  value={placeholders[key]}
+                  onChange={(e) => handlePlaceholderChange(key, e.target.value)}
+                  style={{ width: '90%', padding: 8, fontSize: 12, borderRadius: 5, border: '1px solid #ccc' }}
+                />
               </div>
-              <div className="insert-modal-body" style={{ overflow: 'auto', height: modalHeight - 60 }}>
-                {Object.keys(placeholders).map((key, index) => (
-                  <div key={index} style={{ marginBottom: 10 }}>
-                    <label>{key}</label>
-                    <input
-                      id={`insert-text-${index}`}
-                      type="text"
-                      value={placeholders[key]}
-                      onChange={(e) => handlePlaceholderChange(key, e.target.value)}
-                      style={{ width: '100%' }}
-                    />
-                  </div>
-                ))}
-                <button onClick={handleInsertText} className="insert-button">Insert Text</button>
-              </div>
-            </div>
+            ))}
+            <button onClick={handleInsertText} className="insert-button" style={{ marginTop: 20, padding: '10px 20px', backgroundColor: '#007bff', color: 'white', borderRadius: 5, border: 'none', cursor: 'pointer' }}>Insert Text</button>
           </div>
         </div>
-      )}
+      </div>
+    </div>
+  </Draggable>
+)}
+
+
+
     </div>
   );
 }
