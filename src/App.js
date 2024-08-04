@@ -22,8 +22,8 @@ const App = () => {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/template1" element={<Template1 />} />
-        <Route path="/template2" element={<Template2 />} />
+        <Route path="/template1" element={<Template1 filePath="2.docx"/>} />
+        <Route path="/template2" element={<Template2 filePath="./assets/2.docx" />} />
         <Route path="/template3" element={<Template3 />} />
         <Route path="/template4" element={<Template4 />} />
       </Routes>

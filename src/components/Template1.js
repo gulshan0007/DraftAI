@@ -8,7 +8,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 DocumentEditorContainerComponent.Inject(Toolbar);
 
-function Template1() {
+function Template1({ filePath }) {
   const editorRef = useRef(null);
   const modalEditorRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -36,18 +36,38 @@ function Template1() {
   const [showToolbar, setShowToolbar] = useState(true);
   const [showPropertiesPane, setShowPropertiesPane] = useState(true);
 
+  // useEffect(() => {
+  //   // When modalText changes, update the main editor
+  //   if (modalText && editorRef.current) {
+  //     editorRef.current.documentEditor.open(modalText);
+  //   }
+  // }, [modalText]);
   useEffect(() => {
-    // When modalText changes, update the main editor
-    if (modalText && editorRef.current) {
-      editorRef.current.documentEditor.open(modalText);
+    let isDocumentLoaded = false;
+  
+    if (!isDocumentLoaded) {
+      fetch(filePath)
+        .then(response => response.blob())
+        .then(blob => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            editorRef.current.documentEditor.open(reader.result);
+            isDocumentLoaded = true;
+          };
+          reader.readAsDataURL(blob);
+        })
+        .catch(error => console.error('Error loading file:', error));
     }
-  }, [modalText]);
+  }, [filePath]);
+  
 
   const onSave = () => {
     if (editorRef.current) {
       editorRef.current.documentEditor.save("Sample", "Docx");
     }
   };
+
+
 
   const onEdit = async () => {
     if (editorRef.current) {
@@ -124,6 +144,7 @@ function Template1() {
   };
 
   const handleInsertText = () => {
+    
     const editor = editorRef.current.documentEditor.editor;
     Object.keys(placeholders).forEach((key) => {
       if (key === 'Is there a non-compete clause in this agreement?') {
@@ -197,7 +218,7 @@ function Template1() {
     marginRight: '10px',
     zIndex: 999,
     padding: '12px 24px',
-    backgroundColor: 'red',
+    backgroundColor: '#007bff',
     color: 'white',
     border: 'none',
     borderRadius: '8px',
@@ -290,7 +311,7 @@ function Template1() {
         onClick={handleInsertClick}
         style={insertButtonStyle1}
       >
-        <span style={blinkTextStyle}>Draft</span>
+        Draft
       </button>
 
       <DocumentEditorContainerComponent 
