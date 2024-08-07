@@ -8,7 +8,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 DocumentEditorContainerComponent.Inject(Toolbar);
 
-function Template2() {
+function Template2({ filePath }) {
   const editorRef = useRef(null);
   const modalEditorRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -53,11 +53,23 @@ function Template2() {
   const [showPropertiesPane, setShowPropertiesPane] = useState(true);
 
   useEffect(() => {
-    // When modalText changes, update the main editor
-    if (modalText && editorRef.current) {
-      editorRef.current.documentEditor.open(modalText);
+    let isDocumentLoaded = false;
+  
+    if (!isDocumentLoaded) {
+      fetch(filePath)
+        .then(response => response.blob())
+        .then(blob => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            editorRef.current.documentEditor.open(reader.result);
+            isDocumentLoaded = true;
+          };
+          reader.readAsDataURL(blob);
+        })
+        .catch(error => console.error('Error loading file:', error));
     }
-  }, [modalText]);
+  }, [filePath]);
+  
 
   const onSave = () => {
     if (editorRef.current) {
