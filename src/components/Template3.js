@@ -8,7 +8,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 DocumentEditorContainerComponent.Inject(Toolbar);
 
-function Template1() {
+function Template3({ filePath }) {
   const editorRef = useRef(null);
   const modalEditorRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -21,6 +21,8 @@ function Template1() {
   const [extractedContent, setExtractedContent] = useState(''); // State for extracted content
   const [insertPosition, setInsertPosition] = useState(null);
   const [placeholders, setPlaceholders] = useState({
+    'Party Details ("BETWEEN")?': '',
+    'Party Details ("AND")?': '',
     '[DISCLOSING PARTY NAME]': '',
     '[DISCLOSING PARTY ADDRESS]': '',
     '[DISCLOSING PARTY EMAIL]': '',
@@ -28,16 +30,16 @@ function Template1() {
     '[RECEIVING PARTY ADDRESS]': '',
     '[RECEIVING PARTY EMAIL]': '',
     '[DISCLOSING PARTY]': '',
-    '[RECEIVING PARTY] ': '',
-    '[STATE OR COUNTRY] ': '',
-    '[CONTRACTOR EMAIL] ': '',
-    '[City] ': '',
-    '[COUNTRY] ': '',
-    '[Arbitration Rules] ': '',
-    '[Arbitration Institution] ': '',
+    '[RECEIVING PARTY]': '',
+    '[STATE OR COUNTRY]': '',
+    '[CONTRACTOR EMAIL]': '',
+    '[City]': '',
+    '[COUNTRY]': '',
+    '[Arbitration Rules]': '',
+    '[Arbitration Institution]': '',
 
-    '[number] ': '',
-    '[CLIENT EMAIL] ': '',   
+    '[number]': '',
+    '[CLIENT EMAIL]': '',   
     'Select one?': '', // Custom placeholder
     'How will disputes be resolved?': '',
 
@@ -46,11 +48,23 @@ function Template1() {
   const [showPropertiesPane, setShowPropertiesPane] = useState(true);
 
   useEffect(() => {
-    // When modalText changes, update the main editor
-    if (modalText && editorRef.current) {
-      editorRef.current.documentEditor.open(modalText);
+    let isDocumentLoaded = false;
+  
+    if (!isDocumentLoaded) {
+      fetch(filePath)
+        .then(response => response.blob())
+        .then(blob => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            editorRef.current.documentEditor.open(reader.result);
+            isDocumentLoaded = true;
+          };
+          reader.readAsDataURL(blob);
+        })
+        .catch(error => console.error('Error loading file:', error));
     }
-  }, [modalText]);
+  }, [filePath]);
+  
 
   const onSave = () => {
     if (editorRef.current) {
@@ -170,7 +184,27 @@ function Template1() {
           editorRef.current.documentEditor.searchModule.findAll("Any dispute, controversy, or claim arising out of or relating to this Agreement, including the validity, invalidity, breach, or termination thereof, shall be settled by arbitration in accordance with the [Arbitration Rules] of [Arbitration Institution] in [City], [COUNTRY]. The arbitration shall be conducted by [number] arbitrators appointed in accordance with the said Rules. The decision of the arbitrator(s) shall be final and binding upon both parties.");
           editorRef.current.documentEditor.searchModule.searchResults.replaceAll("Any dispute, controversy, or claim arising out of or relating to this Agreement, including the validity, invalidity, breach, or termination thereof, shall be settled by arbitration in accordance with the [Arbitration Rules] of [Arbitration Institution] in [City], [COUNTRY]. The arbitration shall be conducted by [number] arbitrators appointed in accordance with the said Rules. The decision of the arbitrator(s) shall be final and binding upon both parties.");
         }
-      } else {
+      }else if (key === 'Party Details ("BETWEEN")?') {
+        if (placeholders[key] === 'Company') {
+          editorRef.current.documentEditor.searchModule.findAll("[DISCLOSING PARTY NAME]  (hereinafter referred to as the “Disclosing Party”), a duly incorporated Company under the Companies Act, 2013, with its corporate office located at [DISCLOSING PARTY ADDRESS].");
+          editorRef.current.documentEditor.searchModule.searchResults.replaceAll("[DISCLOSING PARTY NAME]  (hereinafter referred to as the “Disclosing Party”), a duly incorporated Company under the Companies Act, 2013, with its corporate office located at [DISCLOSING PARTY ADDRESS].");
+          editorRef.current.documentEditor.searchModule.findAll("[DISCLOSING PARTY NAME] (hereinafter referred to as the “Disclosing Party”), an individual with his/her main address located at [DISCLOSING PARTY ADDRESS].");
+          editorRef.current.documentEditor.searchModule.searchResults.replaceAll("[DISCLOSING PARTY NAME]  (hereinafter referred to as the “Disclosing Party”), a duly incorporated Company under the Companies Act, 2013, with its corporate office located at [DISCLOSING PARTY ADDRESS].");
+        } else if (placeholders[key] === 'Individual') {
+          editorRef.current.documentEditor.searchModule.findAll("[DISCLOSING PARTY NAME]  (hereinafter referred to as the “Disclosing Party”), a duly incorporated Company under the Companies Act, 2013, with its corporate office located at [DISCLOSING PARTY ADDRESS].");
+          editorRef.current.documentEditor.searchModule.searchResults.replaceAll("[DISCLOSING PARTY NAME] (hereinafter referred to as the “Disclosing Party”), an individual with his/her main address located at [DISCLOSING PARTY ADDRESS].");
+          
+        }
+      }else if (key === 'Party Details ("AND")?') {
+        if (placeholders[key] === 'Individual') {
+          editorRef.current.documentEditor.searchModule.findAll("[RECEIVING PARTY NAME] (hereinafter referred to as the “Receiving Party”), an individual with his/her main address located at [RECEIVING PARTY ADDRESS].");
+          editorRef.current.documentEditor.searchModule.searchResults.replaceAll("[RECEIVING PARTY NAME] (hereinafter referred to as the “Receiving Party”), an individual with his/her main address located at [RECEIVING PARTY ADDRESS].");
+        } else if (placeholders[key] === 'Company') {
+          editorRef.current.documentEditor.searchModule.findAll("[RECEIVING PARTY NAME] (hereinafter referred to as the “Receiving Party”), an individual with his/her main address located at [RECEIVING PARTY ADDRESS].");
+          editorRef.current.documentEditor.searchModule.searchResults.replaceAll("[RECEIVING PARTY NAME]   (hereinafter referred to as the “Client”), a duly incorporated Company under the Companies Act, 2013, with its corporate office located at [RECEIVING PARTY ADDRESS].");
+          
+        }
+      }  else {
         editorRef.current.documentEditor.searchModule.findAll(key);
         editorRef.current.documentEditor.searchModule.searchResults.replaceAll(placeholders[key]);
       }
@@ -195,7 +229,7 @@ function Template1() {
     marginRight: '10px',
     zIndex: 999,
     padding: '12px 24px',
-    backgroundColor: 'red',
+    backgroundColor: '#007bff',
     color: 'white',
     border: 'none',
     borderRadius: '8px',
@@ -288,7 +322,7 @@ function Template1() {
         onClick={handleInsertClick}
         style={insertButtonStyle1}
       >
-        <span style={blinkTextStyle}>Draft</span>
+        Draft
       </button>
 
       <DocumentEditorContainerComponent 
@@ -381,6 +415,28 @@ function Template1() {
                       <option value="Mediation">Mediation</option>
                       <option value="Arbitration">Arbitration</option>
                 </select>
+                ) : key === 'Party Details ("BETWEEN")?' ? (
+                  <select
+                    value={placeholders[key]}
+                    onChange={(e) => handlePlaceholderChange(key, e.target.value)}
+                    style={{ width: '90%', padding: 8, fontSize: 12, borderRadius: 5, border: '1px solid #ccc' }}
+                  >
+                    <option value="">Select an option</option>
+                    <option value="Individual">Individual</option>
+                    <option value="Company">Company</option>
+                    
+                  </select>
+                ): key === 'Party Details ("AND")?' ? (
+                  <select
+                    value={placeholders[key]}
+                    onChange={(e) => handlePlaceholderChange(key, e.target.value)}
+                    style={{ width: '90%', padding: 8, fontSize: 12, borderRadius: 5, border: '1px solid #ccc' }}
+                  >
+                    <option value="">Select an option</option>
+                    <option value="Individual">Individual</option>
+                    <option value="Company">Company</option>
+                    
+                  </select>
                 ) : key === 'Select one?' ? (
                   <select
                     value={placeholders[key]}
@@ -414,4 +470,4 @@ function Template1() {
   );
 }
 
-export default Template1;
+export default Template3;

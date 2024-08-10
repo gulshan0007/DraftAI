@@ -21,27 +21,32 @@ function Template1({ filePath }) {
   const [extractedContent, setExtractedContent] = useState(''); // State for extracted content
   const [insertPosition, setInsertPosition] = useState(null);
   const [placeholders, setPlaceholders] = useState({
-    '[EMPLOYEE NAME]': '',
+    'Party Details ("BETWEEN")?': '',
+    '[EMPLOYER]': '',
+    '[EMPLOYER ADDRESS]': '',
+    '[EMPLOYER EMAIL]': '',
+    '[EMPLOYEE]': '',
     '[EMPLOYEE ADDRESS]': '',
+    '[EMPLOYEE EMAIL]': '',
+    '[EMPLOYER NAME]': '',
+    '[BUSINESS DESCRIPTION]': '',
+    '[JOB TITLE]': '',
+    '[WORK DESCRIPTION]': '',
+    '[Start Time]': '',
+    '[End Time]': '',
+    '[Days of the Week]': '',
+    '[Number]': '',
+    '[PLACE OF WORK]': '',
+    '[Salary Amount]': '',
     '[STATE OR COUNTRY]': '',
-    '[COMPANY NAME]': '',
-    '[COMPANY ADDRESS]': '',
-    '[EFFECTIVE DATE] ': '',
-    // '[City]': '',
-    // '[COUNTRY]': '',
-    'Is there a non-compete clause in this agreement?': '', // Custom placeholder
+    '[City]': '',
+    '[COUNTRY]': '',
     'How will disputes be resolved?': '',
 
   });
   const [showToolbar, setShowToolbar] = useState(true);
   const [showPropertiesPane, setShowPropertiesPane] = useState(true);
 
-  // useEffect(() => {
-  //   // When modalText changes, update the main editor
-  //   if (modalText && editorRef.current) {
-  //     editorRef.current.documentEditor.open(modalText);
-  //   }
-  // }, [modalText]);
   useEffect(() => {
     let isDocumentLoaded = false;
   
@@ -147,28 +152,16 @@ function Template1({ filePath }) {
     
     const editor = editorRef.current.documentEditor.editor;
     Object.keys(placeholders).forEach((key) => {
-      if (key === 'Is there a non-compete clause in this agreement?') {
-        if (placeholders[key] === 'Strict Non-Competition') {
-          editorRef.current.documentEditor.searchModule.findAll("The Employee will not, during the term of this Agreement and for a period of 2 years after its termination, engage, either directly or indirectly, in any business that is competitive to the Company's business within a geographical area that reasonably corresponds to the scope of the Company's business operations.");
-          editorRef.current.documentEditor.searchModule.searchResults.replaceAll("The Employee will not, during the term of this Agreement and for a period of 2 years after its termination, engage, either directly or indirectly, in any business that is competitive to the Company's business within a geographical area that reasonably corresponds to the scope of the Company's business operations.");
-          editorRef.current.documentEditor.searchModule.findAll("The Employee will not engage in any business that directly competes with the Company within a 50-mile radius of the Company's main office for one year following the termination of this Agreement.");
-          editorRef.current.documentEditor.searchModule.searchResults.replaceAll("The Employee will not, during the term of this Agreement and for a period of 2 years after its termination, engage, either directly or indirectly, in any business that is competitive to the Company's business within a geographical area that reasonably corresponds to the scope of the Company's business operations.");
-          editorRef.current.documentEditor.searchModule.findAll('[No Non-Competition Clause]');
-          editorRef.current.documentEditor.searchModule.searchResults.replaceAll('');
-        } else if (placeholders[key] === 'Limited Non-Competition') {
-          editorRef.current.documentEditor.searchModule.findAll("The Employee will not, during the term of this Agreement and for a period of 2 years after its termination, engage, either directly or indirectly, in any business that is competitive to the Company's business within a geographical area that reasonably corresponds to the scope of the Company's business operations.");
-          editorRef.current.documentEditor.searchModule.searchResults.replaceAll("The Employee will not engage in any business that directly competes with the Company within a 50-mile radius of the Company's main office for one year following the termination of this Agreement.");
-          editorRef.current.documentEditor.searchModule.findAll('[Strict Non-Competition]');
-          editorRef.current.documentEditor.searchModule.searchResults.replaceAll('');
-          editorRef.current.documentEditor.searchModule.findAll('[No Non-Competition Clause]');
-          editorRef.current.documentEditor.searchModule.searchResults.replaceAll('');
-        } else if (placeholders[key] === 'No Non-Competition Clause') {
-          editorRef.current.documentEditor.searchModule.findAll("The Employee will not engage in any business that directly competes with the Company within a 50-mile radius of the Company's main office for one year following the termination of this Agreement.");
-          editorRef.current.documentEditor.searchModule.searchResults.replaceAll('');
-          editorRef.current.documentEditor.searchModule.findAll("The Employee will not, during the term of this Agreement and for a period of 2 years after its termination, engage, either directly or indirectly, in any business that is competitive to the Company's business within a geographical area that reasonably corresponds to the scope of the Company's business operations.");
-          editorRef.current.documentEditor.searchModule.searchResults.replaceAll('');
-          editorRef.current.documentEditor.searchModule.findAll('[Limited Non-Competition]');
-          editorRef.current.documentEditor.searchModule.searchResults.replaceAll('');
+      if (key === 'Select one?') {
+        if (placeholders[key] === 'Unilateral Termination') {
+          editorRef.current.documentEditor.searchModule.findAll("This Agreement shall remain in effect until terminated by either party with [NUMBER] days written notice to the other party. Upon termination, the Receiving Party shall promptly return or destroy all copies of the Confidential Information in their possession and provide written certification of such return or destruction to the Disclosing Party.");
+          editorRef.current.documentEditor.searchModule.searchResults.replaceAll("This Agreement shall remain in effect until terminated by either party with [NUMBER] days written notice to the other party. Upon termination, the Receiving Party shall promptly return or destroy all copies of the Confidential Information in their possession and provide written certification of such return or destruction to the Disclosing Party.");
+          editorRef.current.documentEditor.searchModule.findAll("This Agreement shall continue in effect until terminated by mutual written consent of both parties or by either party providing [NUMBER] days written notice to the other party. Upon termination, the Receiving Party shall, within [NUMBER] days, return or destroy all copies of the Confidential Information in their possession and confirm such actions in writing to the Disclosing Party.");
+          editorRef.current.documentEditor.searchModule.searchResults.replaceAll("This Agreement shall remain in effect until terminated by either party with [NUMBER] days written notice to the other party. Upon termination, the Receiving Party shall promptly return or destroy all copies of the Confidential Information in their possession and provide written certification of such return or destruction to the Disclosing Party.");
+        } else if(placeholders[key] === 'Mutual Termination') {
+          editorRef.current.documentEditor.searchModule.findAll("This Agreement shall remain in effect until terminated by either party with [NUMBER] days written notice to the other party. Upon termination, the Receiving Party shall promptly return or destroy all copies of the Confidential Information in their possession and provide written certification of such return or destruction to the Disclosing Party.");
+          editorRef.current.documentEditor.searchModule.searchResults.replaceAll("This Agreement shall continue in effect until terminated by mutual written consent of both parties or by either party providing [NUMBER] days written notice to the other party. Upon termination, the Receiving Party shall, within [NUMBER] days, return or destroy all copies of the Confidential Information in their possession and confirm such actions in writing to the Disclosing Party.");
+          
         }
       } else if (key === 'How will disputes be resolved?') {
         if (placeholders[key] === 'Courts Litigation') {
@@ -192,6 +185,17 @@ function Template1({ filePath }) {
           editorRef.current.documentEditor.searchModule.searchResults.replaceAll("Any dispute, controversy, or claim arising out of or relating to this Agreement, including the validity, invalidity, breach, or termination thereof, shall be settled by arbitration in accordance with the [Arbitration Rules] of [Arbitration Institution] in [City], [COUNTRY]. The arbitration shall be conducted by [number] arbitrators appointed in accordance with the said Rules. The decision of the arbitrator(s) shall be final and binding upon both parties.");
           editorRef.current.documentEditor.searchModule.findAll("Any dispute, controversy, or claim arising out of or relating to this Agreement, including the validity, invalidity, breach, or termination thereof, shall be settled by arbitration in accordance with the [Arbitration Rules] of [Arbitration Institution] in [City], [COUNTRY]. The arbitration shall be conducted by [number] arbitrators appointed in accordance with the said Rules. The decision of the arbitrator(s) shall be final and binding upon both parties.");
           editorRef.current.documentEditor.searchModule.searchResults.replaceAll("Any dispute, controversy, or claim arising out of or relating to this Agreement, including the validity, invalidity, breach, or termination thereof, shall be settled by arbitration in accordance with the [Arbitration Rules] of [Arbitration Institution] in [City], [COUNTRY]. The arbitration shall be conducted by [number] arbitrators appointed in accordance with the said Rules. The decision of the arbitrator(s) shall be final and binding upon both parties.");
+        }
+      }else if (key === 'Party Details ("BETWEEN")?') {
+        if (placeholders[key] === 'Company') {
+          editorRef.current.documentEditor.searchModule.findAll("[EMPLOYER] (hereinafter referred to as the “Employer”), a duly incorporated Company under the Companies Act, 2013, with its corporate office located at [EMPLOYER ADDRESS].");
+          editorRef.current.documentEditor.searchModule.searchResults.replaceAll("[EMPLOYER] (hereinafter referred to as the “Employer”), a duly incorporated Company under the Companies Act, 2013, with its corporate office located at [EMPLOYER ADDRESS].");
+          editorRef.current.documentEditor.searchModule.findAll("[EMPLOYER] (hereinafter referred to as the “Employer”), an individual with his/her main address located at [EMPLOYER ADDRESS].");
+          editorRef.current.documentEditor.searchModule.searchResults.replaceAll("[EMPLOYER] (hereinafter referred to as the “Employer”), a duly incorporated Company under the Companies Act, 2013, with its corporate office located at [EMPLOYER ADDRESS].");
+        } else if (placeholders[key] === 'Individual') {
+          editorRef.current.documentEditor.searchModule.findAll("[EMPLOYER] (hereinafter referred to as the “Employer”), a duly incorporated Company under the Companies Act, 2013, with its corporate office located at [EMPLOYER ADDRESS].");
+          editorRef.current.documentEditor.searchModule.searchResults.replaceAll("[EMPLOYER] (hereinafter referred to as the “Employer”), an individual with his/her main address located at [EMPLOYER ADDRESS].");
+          
         }
       } else {
         editorRef.current.documentEditor.searchModule.findAll(key);
@@ -404,16 +408,26 @@ function Template1({ filePath }) {
                       <option value="Mediation">Mediation</option>
                       <option value="Arbitration">Arbitration</option>
                 </select>
-                ) : key === 'Is there a non-compete clause in this agreement?' ? (
+                ) : key === 'Party Details ("BETWEEN")?' ? (
                   <select
                     value={placeholders[key]}
                     onChange={(e) => handlePlaceholderChange(key, e.target.value)}
                     style={{ width: '90%', padding: 8, fontSize: 12, borderRadius: 5, border: '1px solid #ccc' }}
                   >
                     <option value="">Select an option</option>
-                    <option value="Strict Non-Competition">Strict Non-Competition</option>
-                    <option value="Limited Non-Competition">Limited Non-Competition</option>
-                    <option value="No Non-Competition Clause">No Non-Competition Clause</option>
+                    <option value="Individual">Individual</option>
+                    <option value="Company">Company</option>
+                    
+                  </select>
+                ) : key === 'Select one?' ? (
+                  <select
+                    value={placeholders[key]}
+                    onChange={(e) => handlePlaceholderChange(key, e.target.value)}
+                    style={{ width: '90%', padding: 8, fontSize: 12, borderRadius: 5, border: '1px solid #ccc' }}
+                  >
+                    <option value="">Select an option</option>
+                    <option value="Unilateral Termination ">Unilateral Termination</option>
+                    <option value="Mutual Termination">Mutual Termination</option>
                   </select>
                 ) : (
                   <input

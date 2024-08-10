@@ -21,6 +21,7 @@ function Template1() {
   const [extractedContent, setExtractedContent] = useState(''); // State for extracted content
   const [insertPosition, setInsertPosition] = useState(null);
   const [placeholders, setPlaceholders] = useState({
+    'Party Details ("BETWEEN")?': '',
     '[EMPLOYER]': '',
     '[EMPLOYER ADDRESS]': '',
     '[EMPLOYER EMAIL]': '',
@@ -29,17 +30,17 @@ function Template1() {
     '[EMPLOYEE EMAIL]': '',
     '[EMPLOYER NAME]': '',
     '[BUSINESS DESCRIPTION]': '',
-    '[JOB TITLE] ': '',
-    '[WORK DESCRIPTION] ': '',
-    '[Start Time] ': '',
-    '[End Time] ': '',
-    '[Days of the Week] ': '',
-    '[Number] ': '',
-    '[PLACE OF WORK] ': '',
-    '[Salary Amount] ': '',
-    '[STATE OR COUNTRY] ': '',
-    '[City] ': '',
-    '[COUNTRY] ': '',
+    '[JOB TITLE]': '',
+    '[WORK DESCRIPTION]': '',
+    '[Start Time]': '',
+    '[End Time]': '',
+    '[Days of the Week]': '',
+    '[Number]': '',
+    '[PLACE OF WORK]': '',
+    '[Salary Amount]': '',
+    '[STATE OR COUNTRY]': '',
+    '[City]': '',
+    '[COUNTRY]': '',
     'How will disputes be resolved?': '',
 
   });
@@ -170,6 +171,17 @@ function Template1() {
           editorRef.current.documentEditor.searchModule.searchResults.replaceAll("Any dispute, controversy, or claim arising out of or relating to this Agreement, including the validity, invalidity, breach, or termination thereof, shall be settled by arbitration in accordance with the [Arbitration Rules] of [Arbitration Institution] in [City], [COUNTRY]. The arbitration shall be conducted by [number] arbitrators appointed in accordance with the said Rules. The decision of the arbitrator(s) shall be final and binding upon both parties.");
           editorRef.current.documentEditor.searchModule.findAll("Any dispute, controversy, or claim arising out of or relating to this Agreement, including the validity, invalidity, breach, or termination thereof, shall be settled by arbitration in accordance with the [Arbitration Rules] of [Arbitration Institution] in [City], [COUNTRY]. The arbitration shall be conducted by [number] arbitrators appointed in accordance with the said Rules. The decision of the arbitrator(s) shall be final and binding upon both parties.");
           editorRef.current.documentEditor.searchModule.searchResults.replaceAll("Any dispute, controversy, or claim arising out of or relating to this Agreement, including the validity, invalidity, breach, or termination thereof, shall be settled by arbitration in accordance with the [Arbitration Rules] of [Arbitration Institution] in [City], [COUNTRY]. The arbitration shall be conducted by [number] arbitrators appointed in accordance with the said Rules. The decision of the arbitrator(s) shall be final and binding upon both parties.");
+        }
+      }else if (key === 'Party Details ("BETWEEN")?') {
+        if (placeholders[key] === 'Company') {
+          editorRef.current.documentEditor.searchModule.findAll("[EMPLOYER] (hereinafter referred to as the “Employer”), a duly incorporated Company under the Companies Act, 2013, with its corporate office located at [EMPLOYER ADDRESS].");
+          editorRef.current.documentEditor.searchModule.searchResults.replaceAll("[EMPLOYER] (hereinafter referred to as the “Employer”), a duly incorporated Company under the Companies Act, 2013, with its corporate office located at [EMPLOYER ADDRESS].");
+          editorRef.current.documentEditor.searchModule.findAll("[EMPLOYER] (hereinafter referred to as the “Employer”), an individual with his/her main address located at [EMPLOYER ADDRESS].");
+          editorRef.current.documentEditor.searchModule.searchResults.replaceAll("[EMPLOYER] (hereinafter referred to as the “Employer”), a duly incorporated Company under the Companies Act, 2013, with its corporate office located at [EMPLOYER ADDRESS].");
+        } else if (placeholders[key] === 'Individual') {
+          editorRef.current.documentEditor.searchModule.findAll("[EMPLOYER] (hereinafter referred to as the “Employer”), a duly incorporated Company under the Companies Act, 2013, with its corporate office located at [EMPLOYER ADDRESS].");
+          editorRef.current.documentEditor.searchModule.searchResults.replaceAll("[EMPLOYER] (hereinafter referred to as the “Employer”), an individual with his/her main address located at [EMPLOYER ADDRESS].");
+          
         }
       } else {
         editorRef.current.documentEditor.searchModule.findAll(key);
@@ -382,6 +394,17 @@ function Template1() {
                       <option value="Mediation">Mediation</option>
                       <option value="Arbitration">Arbitration</option>
                 </select>
+                ) : key === 'Party Details ("BETWEEN")?' ? (
+                  <select
+                    value={placeholders[key]}
+                    onChange={(e) => handlePlaceholderChange(key, e.target.value)}
+                    style={{ width: '90%', padding: 8, fontSize: 12, borderRadius: 5, border: '1px solid #ccc' }}
+                  >
+                    <option value="">Select an option</option>
+                    <option value="Individual">Individual</option>
+                    <option value="Company">Company</option>
+                    
+                  </select>
                 ) : key === 'Select one?' ? (
                   <select
                     value={placeholders[key]}

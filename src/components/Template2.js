@@ -21,29 +21,31 @@ function Template2({ filePath }) {
   const [extractedContent, setExtractedContent] = useState(''); // State for extracted content
   const [insertPosition, setInsertPosition] = useState(null);
   const [placeholders, setPlaceholders] = useState({
+    'Party Details ("BETWEEN")?': '',
+    'Party Details ("AND")?': '',
     '[CLIENT]': '',
     '[CLIENT ADDRESS]': '',
     '[STATE OR COUNTRY]': '',
     '[CONTRACTOR NAME]': '',
     '[CONTRACTOR ADDRESS]': '',
-    '[CONTRACTOR] ': '',
-    '[CONTRACTOR EMAIL] ': '',
-    '[CLIENTNAME] ': '',
-    '[CLIENT EMAIL] ': '',
-    '[BUSINESS DESCRIPTION] ': '',
-    '[DESCRIPTION OF SERVICES] ': '',
-    '[DESCRIPTION OF OBLIGATIONS] ': '',
-    '[CURRENCY] ': '',
-    '[AMOUNT] ': '',
-    '[weekly/monthly] ': '',
-    '[specific day] ': '',
-    '[week/month] ': '',
-    '[DURATION] ': '',
-    '[STATE OR COUNTRY] ': '',
-    '[City] ': '',
-    '[COUNTRY] ': '',
-    '[Arbitration Rules] ': '',
-    '[Arbitration Institution] ': '',
+    '[CONTRACTOR]': '',
+    '[CONTRACTOR EMAIL]': '',
+    '[CLIENT NAME]': '',
+    '[CLIENT EMAIL]': '',
+    '[BUSINESS DESCRIPTION]': '',
+    '[DESCRIPTION OF SERVICES]': '',
+    '[DESCRIPTION OF OBLIGATIONS]': '',
+    '[CURRENCY]': '',
+    '[AMOUNT]': '',
+    '[weekly/monthly]': '',
+    '[specific day]': '',
+    '[week/month]': '',
+    '[DURATION]': '',
+    '[STATE OR COUNTRY]': '',
+    '[City]': '',
+    '[COUNTRY]': '',
+    '[Arbitration Rules]': '',
+    '[Arbitration Institution]': '',
     'Is there a non-compete clause in this agreement?': '', // Custom placeholder
     'How will disputes be resolved?': '',
     'Select one option?': '',
@@ -210,6 +212,26 @@ function Template2({ filePath }) {
         } else if (placeholders[key] === 'Regular Installments') {
           editorRef.current.documentEditor.searchModule.findAll("The Contractor shall receive a lump sum payment of [AMOUNT] at the end of the service period, provided all contractual obligations have been fulfilled. Payment will be made within thirty (30) days of the completion of services.");
           editorRef.current.documentEditor.searchModule.searchResults.replaceAll("The Contractor shall be paid in regular instalments of [AMOUNT] on a [weekly/monthly] basis. Payments will be made on the [specific day] of each [week/month] for the duration of the contract.");
+          
+        }
+      }else if (key === 'Party Details ("BETWEEN")?') {
+        if (placeholders[key] === 'Company') {
+          editorRef.current.documentEditor.searchModule.findAll("[CLIENT] (hereinafter referred to as the “Client”), a duly incorporated Company under the Companies Act, 2013, with its corporate office located at [CLIENT ADDRESS].");
+          editorRef.current.documentEditor.searchModule.searchResults.replaceAll("[CLIENT] (hereinafter referred to as the “Client”), a duly incorporated Company under the Companies Act, 2013, with its corporate office located at [CLIENT ADDRESS].");
+          editorRef.current.documentEditor.searchModule.findAll("[CLIENT] (hereinafter referred to as the “Disclosing Party”), an individual with his/her main address located at [CLIENT ADDRESS].");
+          editorRef.current.documentEditor.searchModule.searchResults.replaceAll("[CLIENT] (hereinafter referred to as the “Client”), a duly incorporated Company under the Companies Act, 2013, with its corporate office located at [CLIENT ADDRESS].");
+        } else if (placeholders[key] === 'Individual') {
+          editorRef.current.documentEditor.searchModule.findAll("[CLIENT] (hereinafter referred to as the “Client”), a duly incorporated Company under the Companies Act, 2013, with its corporate office located at [CLIENT ADDRESS].");
+          editorRef.current.documentEditor.searchModule.searchResults.replaceAll("[CLIENT] (hereinafter referred to as the “Disclosing Party”), an individual with his/her main address located at [CLIENT ADDRESS].");
+          
+        }
+      }else if (key === 'Party Details ("AND")?') {
+        if (placeholders[key] === 'Individual') {
+          editorRef.current.documentEditor.searchModule.findAll("[CONTRACTOR NAME] (hereinafter referred to as the “Contractor”), an individual with his/her main address located at [CONTRACTOR ADDRESS].");
+          editorRef.current.documentEditor.searchModule.searchResults.replaceAll("[CONTRACTOR NAME] (hereinafter referred to as the “Contractor”), an individual with his/her main address located at [CONTRACTOR ADDRESS].");
+        } else if (placeholders[key] === 'Company') {
+          editorRef.current.documentEditor.searchModule.findAll("[CONTRACTOR NAME] (hereinafter referred to as the “Contractor”), an individual with his/her main address located at [CONTRACTOR ADDRESS].");
+          editorRef.current.documentEditor.searchModule.searchResults.replaceAll("[CLIENT] (hereinafter referred to as the “Client”), a duly incorporated Company under the Companies Act, 2013, with its corporate office located at [CLIENT ADDRESS].");
           
         }
       } else {
@@ -423,7 +445,29 @@ function Template2({ filePath }) {
                       <option value="Mediation">Mediation</option>
                       <option value="Arbitration">Arbitration</option>
                 </select>
-                ) : key === 'Select one option?' ? (
+                ) : key === 'Party Details ("BETWEEN")?' ? (
+                  <select
+                    value={placeholders[key]}
+                    onChange={(e) => handlePlaceholderChange(key, e.target.value)}
+                    style={{ width: '90%', padding: 8, fontSize: 12, borderRadius: 5, border: '1px solid #ccc' }}
+                  >
+                    <option value="">Select an option</option>
+                    <option value="Individual">Individual</option>
+                    <option value="Company">Company</option>
+                    
+                  </select>
+                ): key === 'Party Details ("AND")?' ? (
+                  <select
+                    value={placeholders[key]}
+                    onChange={(e) => handlePlaceholderChange(key, e.target.value)}
+                    style={{ width: '90%', padding: 8, fontSize: 12, borderRadius: 5, border: '1px solid #ccc' }}
+                  >
+                    <option value="">Select an option</option>
+                    <option value="Individual">Individual</option>
+                    <option value="Company">Company</option>
+                    
+                  </select>
+                ): key === 'Select one option?' ? (
                   <select
                     value={placeholders[key]}
                     onChange={(e) => handlePlaceholderChange(key, e.target.value)}
